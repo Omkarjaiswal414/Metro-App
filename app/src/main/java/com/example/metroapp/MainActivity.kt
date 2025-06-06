@@ -42,25 +42,17 @@ class MainActivity : ComponentActivity() {
 
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp() {
     val fromStation = remember { mutableStateOf("") }
     val toStation = remember { mutableStateOf("") }
-    var dropdown1 by remember { mutableStateOf(false) }
-    var dropdown2 by remember { mutableStateOf(false) }
+    var dropdown1 = remember { mutableStateOf(false) }
+    var dropdown2 = remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-
-
     val context = LocalContext.current
-
-    val metroStations = remember {mutableListOf<String>(
-        "Andheri", "DN Nagar", "Versova", "Marol Naka", "Saki Naka",
-        "Chakala", "Airport Road", "JB Nagar", "Marol Depot",
-        "Asalpha", "Jagruti Nagar", "SEEPZ", "Chhatrapati Shivaji International Airport",
-        "Ghatkopar", "Subhash Nagar", "Charkop", "Kandivali", "Malad"
-    )}
 
 
     Column(
@@ -93,98 +85,10 @@ fun MyApp() {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // this is second text field for Destination with the dropdown menu
-        ExposedDropdownMenuBox(
-            expanded = dropdown1,
-            onExpandedChange = { dropdown1 = it },
-            modifier = Modifier.fillMaxWidth()
-        ){
-            // from textfield
-            OutlinedTextField(
-                modifier = Modifier .menuAnchor().fillMaxWidth(),
-                value = fromStation.value,
-                onValueChange = {
-                    fromStation.value=it
-                    if(it.isEmpty()){
-                        dropdown1=false
-                    }
-                },
-                singleLine = true,
-                label = {
-                    Text(
-                        "Select Source Station",
-                        color = Color(29, 78, 216),
-                        style = TextStyle(fontSize = 18.sp)
-                    )
-                },
-                trailingIcon = {
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+        var t1= textfield(fromStation,dropdown1)
+        t1
 
-                        if (fromStation.value.isNotEmpty()) {
-                            IconButton(
-                                onClick = {
-                                    fromStation.value = ""
-                                    dropdown1 = false
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "Clear",
-                                    tint = Color(29, 78, 216)
-                                )
-                            }
-                        }
-
-                        IconButton(onClick = {
-                            dropdown1 = !dropdown1
-                        }) {
-                            Icon(
-                                imageVector = if (dropdown1) Icons.Default.KeyboardArrowUp
-                                else Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                tint = Color(29, 78, 216)
-                            )
-                        }
-                        //ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdown1)
-                    }
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color(29, 78, 216),
-                    unfocusedTextColor = Color(29, 78, 216),
-                    focusedBorderColor = Color(29, 78, 216),
-                    unfocusedBorderColor = Color(29, 78, 216)
-                ),
-            )
-
-            // dropdown options for textfield
-            ExposedDropdownMenu(
-                expanded = dropdown1,
-                onDismissRequest = { dropdown1 = false },
-                modifier = Modifier
-                    .heightIn(max = 200.dp)
-            )  {
-                metroStations.forEach { station ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                station,
-                                color = Color(29, 78, 216)
-                            )
-                        },
-                        onClick = {
-                            fromStation.value = station
-                            dropdown1 = !dropdown1
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
 
 
         // Swap button for swapping the destination and sources stations
@@ -198,8 +102,8 @@ fun MyApp() {
                     val temp = fromStation.value
                     fromStation.value = toStation.value
                     toStation.value = temp
-                    dropdown1 = false
-                    dropdown2 = false
+                     dropdown1.value=false
+                    dropdown2.value = false
                 },
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = Color(29, 78, 216)
@@ -237,91 +141,9 @@ fun MyApp() {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // this is second text field for Destination with the dropdown menu
-        ExposedDropdownMenuBox(
-            expanded = dropdown2,
-            onExpandedChange = { dropdown2 = it },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // textfield
-            OutlinedTextField(
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                value = toStation.value,
-                onValueChange = {
-                    toStation.value = it
+        var textfield2= textfield(toStation,dropdown2)
 
-                    if(it.isEmpty()){
-                        dropdown2=false
-                    }
-
-                },
-                singleLine = true,
-                label = {
-                    Text(
-                        "Select Destination Station",
-                        color = Color(29, 78, 216),
-                        style = TextStyle(fontSize = 18.sp)
-                    )
-                },
-                trailingIcon = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-
-                        if (toStation.value.isNotEmpty()) {
-                            IconButton(
-                                onClick = {
-                                    toStation.value = ""
-                                    dropdown2 = false
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "Clear",
-                                    tint = Color(29, 78, 216)
-                                )
-                            }
-                        }
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdown2)
-                    }
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color(29, 78, 216),
-                    unfocusedTextColor = Color(29, 78, 216),
-                    focusedBorderColor = Color(29, 78, 216),
-                    unfocusedBorderColor = Color(29, 78, 216)
-                ),
-            )
-
-            // dropdown options for textfield
-            ExposedDropdownMenu(
-                expanded = dropdown2,
-                onDismissRequest = { dropdown2 = false },
-                modifier = Modifier.heightIn(max = 200.dp)
-            ) {
-                metroStations.forEach { station ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                station,
-                                color = Color(29, 78, 216)
-                            )
-                        },
-                        onClick = {
-                            toStation.value = station
-                            dropdown2 = false
-                        }
-                    )
-                }
-            }
-        }
-
-
-        Spacer(modifier = Modifier.height(32.dp))
-
+        textfield2
 
         Button(
             onClick = {
