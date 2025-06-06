@@ -1,7 +1,7 @@
 package com.example.metroapp
 
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -13,8 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,6 +25,8 @@ import com.example.metroapp.ui.theme.MetroAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             MetroAppTheme {
                 Surface(
@@ -45,9 +49,11 @@ fun MyApp() {
     val toStation = remember { mutableStateOf("") }
     var dropdown1 by remember { mutableStateOf(false) }
     var dropdown2 by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
 
 
+    val context = LocalContext.current
 
     val metroStations = remember {mutableListOf<String>(
         "Andheri", "DN Nagar", "Versova", "Marol Naka", "Saki Naka",
@@ -57,11 +63,6 @@ fun MyApp() {
     )}
 
 
-
-
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,6 +70,19 @@ fun MyApp() {
         verticalArrangement = Arrangement.Center
     ) {
 
+        //Header
+        Text(
+            text = "Travel Compare",
+            color = Color(29, 78, 216),
+            style = TextStyle(
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(top = 0.dp, start = 40.dp,end= 20.dp, bottom = 40.dp),
+            textAlign = TextAlign.Center
+        )
+
+        // Text
         Text(
             text = "From",
             color = Color(29, 78, 216),
@@ -79,11 +93,13 @@ fun MyApp() {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
+        // this is second text field for Destination with the dropdown menu
         ExposedDropdownMenuBox(
             expanded = dropdown1,
             onExpandedChange = { dropdown1 = it },
             modifier = Modifier.fillMaxWidth()
         ){
+            // from textfield
             OutlinedTextField(
                 modifier = Modifier .menuAnchor().fillMaxWidth(),
                 value = fromStation.value,
@@ -124,7 +140,6 @@ fun MyApp() {
 
                         IconButton(onClick = {
                             dropdown1 = !dropdown1
-                            Log.e("button clicked ${dropdown1}", "dropdown")
                         }) {
                             Icon(
                                 imageVector = if (dropdown1) Icons.Default.KeyboardArrowUp
@@ -145,6 +160,7 @@ fun MyApp() {
                 ),
             )
 
+            // dropdown options for textfield
             ExposedDropdownMenu(
                 expanded = dropdown1,
                 onDismissRequest = { dropdown1 = false },
@@ -170,12 +186,12 @@ fun MyApp() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
+
+        // Swap button for swapping the destination and sources stations
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
-
-
         ) {
             OutlinedButton(
                 onClick = {
@@ -210,6 +226,7 @@ fun MyApp() {
 
         Spacer(modifier = Modifier.height(22.dp))
 
+        // Text
         Text(
             text = "To",
             color = Color(29, 78, 216),
@@ -220,12 +237,13 @@ fun MyApp() {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-
+        // this is second text field for Destination with the dropdown menu
         ExposedDropdownMenuBox(
             expanded = dropdown2,
             onExpandedChange = { dropdown2 = it },
             modifier = Modifier.fillMaxWidth()
         ) {
+            // textfield
             OutlinedTextField(
                 modifier = Modifier
                     .menuAnchor()
@@ -278,6 +296,7 @@ fun MyApp() {
                 ),
             )
 
+            // dropdown options for textfield
             ExposedDropdownMenu(
                 expanded = dropdown2,
                 onDismissRequest = { dropdown2 = false },
@@ -306,7 +325,12 @@ fun MyApp() {
 
         Button(
             onClick = {
-                // Add your search logic here
+                if(fromStation.value!=toStation.value) {
+                    showDialog = true
+                }
+                else{
+                    Toast.makeText(context,"Source and Destination are Same", Toast.LENGTH_LONG).show()
+                }
                 },
             enabled = fromStation.value.isNotEmpty() && toStation.value.isNotEmpty(),
             colors = ButtonDefaults.buttonColors(
@@ -327,6 +351,29 @@ fun MyApp() {
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium
             )
+        }
+
+        if(showDialog){
+            AlertDialog(onDismissRequest = { showDialog=false },
+                confirmButton = {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center) {
+
+                        Button(onClick = {showDialog=false}) {
+                            Text(text = "Dismiss",)
+                        }
+                    }
+                },
+                title = {Text(text = "Metro Route")},
+                text={
+                    Text("Your Metro Route :\n" +
+                            " ${fromStation.value} -> ${toStation.value}",
+                        style = TextStyle(fontSize = 18.sp),
+                        modifier = Modifier.padding(20.dp),
+                        textAlign = TextAlign.Center)
+                })
         }
 
 
